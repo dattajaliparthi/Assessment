@@ -1,0 +1,47 @@
+Groovy code:
+
+pipeline {
+    agent any
+
+    environment {
+        CF_STACK_NAME = 'your_stack_name'
+        LAMBDA_FUNCTION_NAME = 'your_lambda_function_name'
+        S3_BUCKET_NAME = 'your_s3_bucket_name'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                // Build your lambda function
+                sh 'your_build_command_here'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Use CloudFormation to deploy lambda function
+                    sh "aws cloudformation deploy --template-file your_template.yaml --stack-name $CF_STACK_NAME"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up resources, if necessary
+        }
+    }
+
+    triggers {
+        cron('0 9 * * 1')
+    }
+}
+
+
+Assumptions made:
+
+Jenkins is running on AWS and has the necessary permissions.
+CloudFormation template (your_template.yaml) contains the necessary configuration for your Lambda function.
+The pipeline runs every Monday at 9am GMT to trigger the lambda function.
+
